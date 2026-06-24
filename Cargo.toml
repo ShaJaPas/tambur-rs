@@ -1,0 +1,56 @@
+[package]
+name = "tambur-rs"
+version = "0.1.0"
+edition = "2024"
+description = "Streaming forward error correction (Tambur-style)"
+readme = "README.md"
+license = "Apache-2.0"
+
+[features]
+default = ["std"]
+std = []
+bench = []
+parallel = ["rayon"]
+
+[dependencies]
+bytes = "1"
+thiserror = "2"
+rayon = { version = "1", optional = true }
+
+[target.'cfg(any(target_arch = "x86", target_arch = "x86_64"))'.dependencies]
+cpufeatures = "0.3"
+
+[dev-dependencies]
+bytes = "1"
+tokio = { version = "1", features = ["full"] }
+criterion = { version = "0.8", features = ["html_reports"] }
+
+[[example]]
+name = "webcam_fec_stream"
+path = "examples/webcam_fec_stream.rs"
+required-features = ["std"]
+
+[[bench]]
+name = "e2e"
+harness = false
+required-features = ["bench"]
+
+[[bench]]
+name = "fec"
+harness = false
+required-features = ["bench"]
+
+[profile.bench]
+codegen-units = 1
+lto = "fat"
+
+[lints.rust]
+missing_docs = "deny"
+unused_lifetimes = "deny"
+unused_qualifications = "deny"
+unreachable_pub = "deny"
+
+[lints.clippy]
+std_instead_of_core = "warn"
+std_instead_of_alloc = "warn"
+undocumented_unsafe_blocks = "deny"
