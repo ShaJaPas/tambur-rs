@@ -124,7 +124,12 @@ impl PayloadMatrix {
         }
         Ok(rows
             .iter()
-            .map(|&row| unsafe { ptr.add(row * row_len) })
+            .map(|&row| {
+                // SAFETY: `row` is bounds-checked above (`row < self.rows`), `row_len` is
+                // `self.max_cols`, and `ptr` points to `self.buf` which has at least
+                // `self.rows * self.max_cols` bytes allocated.
+                unsafe { ptr.add(row * row_len) }
+            })
             .collect())
     }
 

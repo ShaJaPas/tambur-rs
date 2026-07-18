@@ -100,7 +100,7 @@ pub fn e2e_bench_config(tau: u8, frame_size: u32) -> Config {
     let stripe_size = u32::from(WordSize::W32) * 8;
     let num_data_stripes = frame_size.div_ceil(stripe_size).max(1) as u16;
     // [`Feedback::High`] emits 50% parity stripes.
-    let max_fec_stripes = ((u32::from(num_data_stripes) + 1) / 2).max(1) as u16;
+    let max_fec_stripes = u32::from(num_data_stripes).div_ceil(2).max(1) as u16;
 
     Config::builder()
         .tau(Tau::new(tau).expect("tau in range"))

@@ -298,7 +298,7 @@ for wire_packet in receive_from_network() {
 
 ## Minimum supported Rust version (MSRV)
 
-Rust 1.80 or later.
+Rust 1.89 or later.
 
 ## License
 

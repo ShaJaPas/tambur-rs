@@ -272,10 +272,7 @@ impl Decoder {
     }
 
     fn purge_expired(&mut self, session_index: u64) {
-        loop {
-            let Some(expired) = self.min_session_in_window() else {
-                break;
-            };
+        while let Some(expired) = self.min_session_in_window() {
             if !frame_expired(session_index, expired, self.window_size) {
                 break;
             }
@@ -428,7 +425,7 @@ mod tests {
         let total_frames: u64 = 10;
 
         // Track all recovered sessions
-        let mut recovered: std::collections::BTreeSet<u64> = std::collections::BTreeSet::new();
+        let mut recovered: BTreeSet<u64> = BTreeSet::new();
 
         for i in 0..total_frames {
             let session = start + i;

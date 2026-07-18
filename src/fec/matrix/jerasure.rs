@@ -445,6 +445,9 @@ pub(crate) fn matrix_decode_payloads_parallel<G: GfEngine + 'static>(
                 .par_iter()
                 .enumerate()
                 .try_for_each(|(idx, &row)| {
+                    // SAFETY: `data_addrs[idx]` was produced by `get_row_ptrs` which validates
+                    // row bounds and returns disjoint `*mut u8`; `size` is the stripe byte count
+                    // and fits within each row's allocation (`cols == size`).
                     let dest = unsafe {
                         core::slice::from_raw_parts_mut(data_addrs[idx] as *mut u8, size)
                     };
@@ -455,6 +458,10 @@ pub(crate) fn matrix_decode_payloads_parallel<G: GfEngine + 'static>(
                         if coeff == 0 {
                             continue;
                         }
+                        // SAFETY: `src_ptrs[i]` was collected from `data.row(id)` or
+                        // `coding.row(id)`, both returning validated `&mut [u8]` of length
+                        // `cols`; the pointers are converted to `usize` and re-constructed
+                        // here with the same `size` bound.
                         let src =
                             unsafe { core::slice::from_raw_parts(src_ptrs[i] as *const u8, size) };
                         if coeff == 1 {
@@ -516,6 +523,9 @@ pub(crate) fn matrix_decode_payloads_parallel<G: GfEngine + 'static>(
             .par_iter()
             .enumerate()
             .try_for_each(|(idx, &i)| {
+                // SAFETY: `coding_addrs[idx]` comes from `coding.get_row_ptrs()` which
+                // validates row bounds and returns disjoint `*mut u8`; `size` equals
+                // `cols` (stripe byte count) and fits within each row.
                 let dest =
                     unsafe { core::slice::from_raw_parts_mut(coding_addrs[idx] as *mut u8, size) };
                 let matrix_row = &matrix[i * k..(i + 1) * k];
@@ -525,6 +535,9 @@ pub(crate) fn matrix_decode_payloads_parallel<G: GfEngine + 'static>(
                     if coeff == 0 {
                         continue;
                     }
+                    // SAFETY: `data_ptrs[j]` was taken from `data.row(j)?.as_ptr()`,
+                    // which returns a validated `&[u8]` of length `cols`; the pointer
+                    // is re-constructed here with the same `size` bound.
                     let src =
                         unsafe { core::slice::from_raw_parts(data_ptrs[j] as *const u8, size) };
                     if coeff == 1 {

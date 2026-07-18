@@ -301,8 +301,8 @@ mod tests {
         let specs = p.plan_frame(256, Feedback::High);
         // 256 bytes → 1 data stripe → ceil(1/2) = 1 parity stripe → 1+1 = 2 pkts
         assert_eq!(specs.len(), 2);
-        assert!(specs[0].is_parity == false);
-        assert!(specs[1].is_parity == true);
+        assert!(!specs[0].is_parity);
+        assert!(specs[1].is_parity);
     }
 
     #[test]
