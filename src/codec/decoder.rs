@@ -374,6 +374,7 @@ impl Decoder {
 
 #[cfg(test)]
 mod tests {
+    use alloc::collections::BTreeSet;
     use core::time::Duration;
 
     use super::*;
