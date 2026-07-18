@@ -38,7 +38,8 @@ The crate is **transport-agnostic** — it produces opaque `FecDatagram`s and ex
 
 ```rust
 use bytes::Bytes;
-use tambur_rs::{Config, Encoder, Decoder, FecDatagram, Feedback};
+use core::time::Duration;
+use tambur_rs::{Config, Decoder, DecoderEvent, Encoder, FecDatagram, Feedback};
 
 // 1. Both sides agree on the same session parameters.
 let config = Config::builder()
@@ -214,9 +215,9 @@ The decoder collects data and parity stripes. Once it has enough for a given fra
 
 ### Sender with adaptive feedback
 
-```rust
+```rust,no_run
 use bytes::Bytes;
-use std::time::Duration;
+use core::time::Duration;
 use tambur_rs::{
     Config, Encoder, Feedback, FeedbackCodec,
 };
@@ -232,9 +233,10 @@ let feedback_codec = FeedbackCodec::new(&config);
 
 // Encode a frame
 let datagrams = enc.encode_payload(Bytes::from_static(b"frame data")).unwrap();
-for pkt in &datagrams {
+for pkt in datagrams {
     let (header, payload) = pkt.wire_parts().unwrap();
-    send_over_udp(header, payload);
+    // Send header + payload over your transport with writev / sendmsg
+    let _ = (header, payload);
 }
 
 // Apply feedback received from the decoder
@@ -244,9 +246,9 @@ enc.apply_feedback(fb);
 
 ### Receiver with bandwidth prediction
 
-```rust
+```rust,no_run
 use bytes::Bytes;
-use std::time::Duration;
+use core::time::Duration;
 use tambur_rs::{
     Config, Decoder, DecoderEvent, FecDatagram, Feedback,
     FeedbackManager, HighBandwidthPredictor,
@@ -261,18 +263,22 @@ let mut fb_mgr = FeedbackManager::with_current_feedback(
 );
 let mut now = Duration::ZERO;
 
-for wire_packet in receive_from_network() {
+// In a real application, replace with your transport receive loop:
+let incoming_packets: [Bytes; 0] = [];
+for wire_packet in incoming_packets {
     let datagram = FecDatagram::from_bytes(wire_packet).unwrap();
     let outcome = dec.receive_datagram(datagram, now);
     for event in outcome.events {
         match event {
             DecoderEvent::FrameRecovered(frame) => {
-                playout(frame.payload);
+                // Play out the recovered frame (e.g. decode video, play audio)
+                let _ = frame;
             }
             DecoderEvent::LossReportReady(report) => {
                 let fb = fb_mgr.handle_report(report);
                 let wire_byte = fb_mgr.encode_wire(fb);
-                send_feedback_byte(wire_byte);
+                // Send wire_byte to the encoder over your transport
+                let _ = wire_byte;
             }
         }
     }
