@@ -8,7 +8,7 @@ license = "Apache-2.0"
 rust-version = "1.89"
 repository = "https://github.com/ShaJaPas/tambur-rs"
 categories = ["algorithms", "encoding", "network-programming"]
-keywords = ["fec", "forward-error-correction", "reed-solomon", "streaming", "error-correction"]
+keywords = ["fec", "reed-solomon", "streaming", "error-correction", "tambur"]
 
 [features]
 default = ["std"]
