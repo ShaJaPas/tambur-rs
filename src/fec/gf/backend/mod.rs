@@ -19,6 +19,11 @@ pub(crate) fn warm_gf32_shuffle_cache(coeffs: &[i32]) {
     x86_gf32_split4::Gf32Split4ShuffleTables::warm_cache_for_coefficients(coeffs);
 }
 
+#[cfg(all(target_arch = "aarch64", feature = "std"))]
+pub(crate) fn warm_gf32_shuffle_cache(coeffs: &[i32]) {
+    neon::warm_gf32_shuffle_cache(coeffs);
+}
+
 pub(super) fn region_xor(src: &[u8], dest: &mut [u8]) {
     #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
     {

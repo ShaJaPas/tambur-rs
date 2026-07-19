@@ -26,8 +26,7 @@ const fn gf8_mul_bit(a: u8, b: u8) -> u8 {
     prod
 }
 
-#[cfg(test)]
-const fn gf32_mul_bit(a: u32, b: u32) -> u32 {
+pub(super) const fn gf32_mul_bit(a: u32, b: u32) -> u32 {
     if a == 0 || b == 0 {
         return 0;
     }
@@ -157,7 +156,7 @@ impl Gf32SplitTables {
         let mut tables = [[0u32; 16]; 8];
         for (pos, row) in tables.iter_mut().enumerate() {
             for (nibble, cell) in row.iter_mut().enumerate() {
-                *cell = crate::fec::gf::backend::gf32_mul((nibble as u32) << (pos * 4), coeff);
+                *cell = gf32_mul_bit((nibble as u32) << (pos * 4), coeff);
             }
         }
         Self { tables }
