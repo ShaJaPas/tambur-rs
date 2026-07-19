@@ -1,11 +1,14 @@
 [package]
 name = "tambur-rs"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2024"
 description = "Streaming forward error correction (Tambur-style)"
 readme = "README.md"
 license = "Apache-2.0"
 rust-version = "1.89"
+repository = "https://github.com/ShaJaPas/tambur-rs"
+categories = ["algorithms", "encoding", "network-programming"]
+keywords = ["fec", "forward-error-correction", "reed-solomon", "streaming", "error-correction"]
 
 [features]
 default = ["std"]
